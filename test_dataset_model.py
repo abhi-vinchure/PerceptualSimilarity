@@ -28,25 +28,26 @@ if(opt.model in ['l2','ssim']):
 # initialize model
 trainer = lpips.Trainer()
 # trainer.initialize(model=opt.model,net=opt.net,colorspace=opt.colorspace,model_path=opt.model_path,use_gpu=opt.use_gpu)
-trainer.initialize(model=opt.model, net=opt.net, colorspace=opt.colorspace, 
+if __name__ == '__main__':
+	trainer.initialize(model=opt.model, net=opt.net, colorspace=opt.colorspace, 
 	model_path=opt.model_path, use_gpu=opt.use_gpu, pnet_rand=opt.from_scratch, pnet_tune=opt.train_trunk,
 	version=opt.version, gpu_ids=opt.gpu_ids)
 
-if(opt.model in ['net-lin','net']):
-	print('Testing model [%s]-[%s]'%(opt.model,opt.net))
-elif(opt.model in ['l2','ssim']):
-	print('Testing model [%s]-[%s]'%(opt.model,opt.colorspace))
+	if(opt.model in ['net-lin','net']):
+		print('Testing model [%s]-[%s]'%(opt.model,opt.net))
+	elif(opt.model in ['l2','ssim']):
+		print('Testing model [%s]-[%s]'%(opt.model,opt.colorspace))
 
 # initialize data loader
-for dataset in opt.datasets:
-	data_loader = dl.CreateDataLoader(dataset,dataset_mode=opt.dataset_mode, batch_size=opt.batch_size, nThreads=opt.nThreads)
+	for dataset in opt.datasets:
+		data_loader = dl.CreateDataLoader(dataset,dataset_mode=opt.dataset_mode, batch_size=opt.batch_size, nThreads=opt.nThreads)
 
 	# evaluate model on data
-	if(opt.dataset_mode=='2afc'):
-		(score, results_verbose) = lpips.score_2afc_dataset(data_loader, trainer.forward, name=dataset)
-	elif(opt.dataset_mode=='jnd'):
-		(score, results_verbose) = lpips.score_jnd_dataset(data_loader, trainer.forward, name=dataset)
+		if(opt.dataset_mode=='2afc'):
+			(score, results_verbose) = lpips.score_2afc_dataset(data_loader, trainer.forward, name=dataset)
+		elif(opt.dataset_mode=='jnd'):
+			(score, results_verbose) = lpips.score_jnd_dataset(data_loader, trainer.forward, name=dataset)
 
 	# print results
-	print('  Dataset [%s]: %.2f'%(dataset,100.*score))
+		print('  Dataset [%s]: %.2f'%(dataset,100.*score))
 
