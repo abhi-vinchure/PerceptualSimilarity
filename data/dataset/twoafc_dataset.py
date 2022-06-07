@@ -3,6 +3,7 @@ import torchvision.transforms as transforms
 from data.dataset.base_dataset import BaseDataset
 from data.image_folder import make_dataset
 from PIL import Image
+from PIL import ImageFile
 import numpy as np
 import torch
 # from IPython import embed
@@ -40,6 +41,7 @@ class TwoAFCDataset(BaseDataset):
         self.judge_paths = sorted(self.judge_paths)
 
     def __getitem__(self, index):
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
         p0_path = self.p0_paths[index]
         p0_img_ = Image.open(p0_path).convert('RGB')
         p0_img = self.transform(p0_img_)
