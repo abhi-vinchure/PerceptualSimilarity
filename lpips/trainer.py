@@ -104,7 +104,7 @@ class Trainer():
 
     def clamp_weights(self):
         for module in self.net.modules():
-            if(hasattr(module, 'weight') and module.kernel_size==(1,1)):
+            if(hasattr(module, 'weight') and hasattr(module, "kernel_size") and module.kernel_size==(1,1)):
                 module.weight.data = torch.clamp(module.weight.data,min=0)
 
     def set_input(self, data):
