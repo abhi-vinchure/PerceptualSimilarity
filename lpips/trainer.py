@@ -8,6 +8,8 @@ from collections import OrderedDict
 from torch.autograd import Variable
 from scipy.ndimage import zoom
 from tqdm import tqdm
+from vegans.utils import networks
+
 import lpips
 import os
 

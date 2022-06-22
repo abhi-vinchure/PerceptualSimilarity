@@ -79,6 +79,9 @@ class LPIPS(nn.Module):
         elif(self.pnet_type=='squeeze'):
             net_type = pn.squeezenet
             self.chns = [64,128,256,384,384,512,512]
+        elif(self.pnet_type=='resnet'):
+            net_type = pn.resnet
+            self.chns = [64,48,32,16,16]
         self.L = len(self.chns)
 
         self.net = net_type(pretrained=not self.pnet_rand, requires_grad=self.pnet_tune)

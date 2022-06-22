@@ -134,9 +134,29 @@ class vgg16(torch.nn.Module):
         return out
 
 
+# class AE(torch.nn.Module):
+#     def __init__(self, requires_grad=False, pretrained=True):
+#         super(AE, self).__init__();
+#         self.encoder = torch.nn.Sequential(
+#             torch.nn.Linear(28 * 28, 256),
+#             torch.nn.ReLU(),
+#             torch.nn.Linear(256, 128),
+#             torch.nn.ReLU(),
+#             torch.nn.Linear(128, 64),
+#             torch.nn.ReLU(),
+#             torch.nn.Linear(64, 10)
+#         )
+#         if not requires_grad:
+#             for param in self.parameters():
+#                 param.requires_grad = False
+#
+#     def forward(self, x):
+#         encoded = self.encoder(x)
+#         return encoded
+
 
 class resnet(torch.nn.Module):
-    def __init__(self, requires_grad=False, pretrained=True, num=18):
+    def __init__(self, requires_grad=False, pretrained=True, num=50):
         super(resnet, self).__init__()
         if(num==18):
             self.net = tv.resnet18(pretrained=pretrained)
