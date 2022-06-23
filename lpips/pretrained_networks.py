@@ -2,6 +2,7 @@ from collections import namedtuple
 import torch
 from torchvision import models as tv
 
+
 class squeezenet(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(squeezenet, self).__init__()
@@ -16,7 +17,7 @@ class squeezenet(torch.nn.Module):
         self.N_slices = 7
         for x in range(2):
             self.slice1.add_module(str(x), pretrained_features[x])
-        for x in range(2,5):
+        for x in range(2, 5):
             self.slice2.add_module(str(x), pretrained_features[x])
         for x in range(5, 8):
             self.slice3.add_module(str(x), pretrained_features[x])
@@ -47,8 +48,8 @@ class squeezenet(torch.nn.Module):
         h_relu6 = h
         h = self.slice7(h)
         h_relu7 = h
-        vgg_outputs = namedtuple("SqueezeOutputs", ['relu1','relu2','relu3','relu4','relu5','relu6','relu7'])
-        out = vgg_outputs(h_relu1,h_relu2,h_relu3,h_relu4,h_relu5,h_relu6,h_relu7)
+        vgg_outputs = namedtuple("SqueezeOutputs", ['relu1', 'relu2', 'relu3', 'relu4', 'relu5', 'relu6', 'relu7'])
+        out = vgg_outputs(h_relu1, h_relu2, h_relu3, h_relu4, h_relu5, h_relu6, h_relu7)
 
         return out
 
@@ -93,6 +94,7 @@ class alexnet(torch.nn.Module):
 
         return out
 
+
 class vgg16(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(vgg16, self).__init__()
@@ -134,39 +136,18 @@ class vgg16(torch.nn.Module):
         return out
 
 
-# class AE(torch.nn.Module):
-#     def __init__(self, requires_grad=False, pretrained=True):
-#         super(AE, self).__init__();
-#         self.encoder = torch.nn.Sequential(
-#             torch.nn.Linear(28 * 28, 256),
-#             torch.nn.ReLU(),
-#             torch.nn.Linear(256, 128),
-#             torch.nn.ReLU(),
-#             torch.nn.Linear(128, 64),
-#             torch.nn.ReLU(),
-#             torch.nn.Linear(64, 10)
-#         )
-#         if not requires_grad:
-#             for param in self.parameters():
-#                 param.requires_grad = False
-#
-#     def forward(self, x):
-#         encoded = self.encoder(x)
-#         return encoded
-
-
 class resnet(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True, num=50):
         super(resnet, self).__init__()
-        if(num==18):
+        if (num == 18):
             self.net = tv.resnet18(pretrained=pretrained)
-        elif(num==34):
+        elif (num == 34):
             self.net = tv.resnet34(pretrained=pretrained)
-        elif(num==50):
+        elif (num == 50):
             self.net = tv.resnet50(pretrained=pretrained)
-        elif(num==101):
+        elif (num == 101):
             self.net = tv.resnet101(pretrained=pretrained)
-        elif(num==152):
+        elif (num == 152):
             self.net = tv.resnet152(pretrained=pretrained)
         self.N_slices = 5
 
@@ -194,7 +175,67 @@ class resnet(torch.nn.Module):
         h = self.layer4(h)
         h_conv5 = h
 
-        outputs = namedtuple("Outputs", ['relu1','conv2','conv3','conv4','conv5'])
+        outputs = namedtuple("Outputs", ['relu1', 'conv2', 'conv3', 'conv4', 'conv5'])
         out = outputs(h_relu1, h_conv2, h_conv3, h_conv4, h_conv5)
+
+        return out
+
+
+class TransitionWithSkip(torch.nn.Module):
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+
+    def forward(self, X):
+        for module in self.module:
+            X = module(X)
+            if isinstance(module,torch.nn.ReLU):
+                skip = X
+        return X, skip
+
+
+class densenet(torch.nn.Module):
+    def __init__(self, requires_grad=False, pretrained=True, num=121):
+        super(densenet, self).__init__()
+        if num==121:
+            pretrained_features = tv.densenet121(pretrained=pretrained).features
+        elif num==161:
+            pretrained_features = tv.densenet161(pretrained=pretrained).features
+        elif num==169:
+            pretrained_features = tv.densenet169(pretrained=pretrained).features
+        elif num==201:
+            pretrained_features = tv.densenet201(pretrained=pretrained).features
+        self.N_slices = 5
+
+        self.slice1 = torch.nn.Sequential(pretrained_features.conv0,
+                                          pretrained_features.norm0,
+                                          TransitionWithSkip(pretrained_features.relu0)
+                                          )
+        self.slice2 = torch.nn.Sequential(pretrained_features.pool0,
+                                          pretrained_features.denseblock1,
+                                          TransitionWithSkip(pretrained_features.transition1)
+                                          )
+        self.slice3 = torch.nn.Sequential(pretrained_features.denseblock2,
+                                          TransitionWithSkip(pretrained_features.transition2)
+                                          )
+        self.slice4 = torch.nn.Sequential(pretrained_features.denseblock3,
+                                          TransitionWithSkip(pretrained_features.transition3)
+                                          )
+        self.slice5 = torch.nn.Sequential(pretrained_features.denseblock4,
+                                          pretrained_features.norm5)
+        self.slices = [self.slice1, self.slice2, self.slice3, self.slice4, self.slice5]
+
+    def forward(self, X):
+        features = []
+        for i in range(self.N_slices):
+            X = self.slices[i](X)
+            if isinstance(X, (list, tuple)):
+                X, skip = X
+                features.append(skip)
+            else:
+                features.append(X)
+
+        outputs = namedtuple("Outputs", ['slice1', 'slice2', 'slice3', 'slice4', 'slice5'])
+        out = outputs(features)
 
         return out

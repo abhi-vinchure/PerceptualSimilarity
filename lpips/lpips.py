@@ -82,6 +82,9 @@ class LPIPS(nn.Module):
         elif(self.pnet_type=='resnet'):
             net_type = pn.resnet
             self.chns = [64, 256, 512, 1024, 2048]
+        elif(self.pnet_type in ['densenet', 'densenet121']):
+            net_type = pn.densenet
+            self.chns = [64, 256, 512, 1024, 1024]
         self.L = len(self.chns)
 
         self.net = net_type(pretrained=not self.pnet_rand, requires_grad=self.pnet_tune)
