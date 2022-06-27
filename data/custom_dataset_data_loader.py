@@ -4,6 +4,9 @@ import os
 
 def CreateDataset(dataroots,dataset_mode='2afc',load_size=64,):
     dataset = None
+    if dataset_mode=='mnist': # mnist
+        from data.dataset.mnist_dataset import MNISTDataset
+        dataset = MNISTDataset()
     if dataset_mode=='2afc': # human judgements
         from data.dataset.twoafc_dataset import TwoAFCDataset
         dataset = TwoAFCDataset()

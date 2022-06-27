@@ -1,5 +1,7 @@
 import argparse
 import lpips
+import torch
+from torchvision import transforms
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-p0','--path0', type=str, default='./imgs/ex_ref.png')
@@ -16,6 +18,7 @@ if(opt.use_gpu):
 	loss_fn.cuda()
 
 # Load images
+img0 = transforms.Resize((64, 64)) 
 img0 = lpips.im2tensor(lpips.load_image(opt.path0)) # RGB image from [-1,1]
 img1 = lpips.im2tensor(lpips.load_image(opt.path1))
 
