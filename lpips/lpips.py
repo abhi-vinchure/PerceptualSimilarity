@@ -90,10 +90,10 @@ class LPIPS(nn.Module):
             self.chns = [64, 256, 512, 1024, 1024]
         self.L = len(self.chns)
 
-        if displayParams:
-            print_network(net_type)
-
         self.net = net_type(pretrained=not self.pnet_rand, requires_grad=self.pnet_tune)
+
+        if displayParams:
+            print_network(self.net)
 
         if (lpips):
             self.lin0 = NetLinLayer(self.chns[0], use_dropout=use_dropout)
