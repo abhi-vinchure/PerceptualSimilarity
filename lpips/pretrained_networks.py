@@ -239,3 +239,19 @@ class densenet(torch.nn.Module):
         out = outputs(features)
 
         return out
+
+
+class inception(torch.nn.Module):
+    def __init__(self, requires_grad=False, pretrained=True):
+        super(inception, self).__init__()
+
+    def forward(self, X):
+        return None
+
+
+class mobilenet(torch.nn.Module):
+    def __init__(self, requires_grad=False, pretrained=True):
+        super(mobilenet, self).__init__()
+
+    def forward(self, X):
+        return None
