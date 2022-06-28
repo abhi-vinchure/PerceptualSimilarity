@@ -255,3 +255,19 @@ class mobilenet(torch.nn.Module):
 
     def forward(self, X):
         return None
+
+
+class xception(torch.nn.Module):
+    def __init__(self, requires_grad=False, pretrained=True):
+        super(xception, self).__init__()
+
+    def forward(self, X):
+        return None
+
+
+class senet(torch.nn.Module):
+    def __init__(self, requires_grad=False, pretrained=True):
+        super(senet, self).__init__()
+
+    def forward(self, X):
+        return None
