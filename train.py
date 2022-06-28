@@ -55,6 +55,8 @@ D = len(dataset)
 print('Loading %i instances from'%dataset_size,opt.datasets)
 visualizer = Visualizer(opt)
 
+training_start_time = time.time()
+
 total_steps = 0
 fid = open(os.path.join(opt.checkpoints_dir,opt.name,'train_log.txt'),'w+')
 for epoch in range(1, opt.nepoch + opt.nepoch_decay + 1):
@@ -100,5 +102,8 @@ for epoch in range(1, opt.nepoch + opt.nepoch_decay + 1):
     if epoch > opt.nepoch:
         trainer.update_learning_rate(opt.nepoch_decay)
 
+training_end_time = time.time()
+
+print("Total Training Time:", training_end_time - training_start_time)
 # trainer.save_done(True)
 fid.close()
