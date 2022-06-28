@@ -24,7 +24,9 @@ if(opt.use_gpu):
 # crawl directories
 f = open(opt.out,'w')
 files = os.listdir(opt.dir0)
-dist01_dict = []
+
+dist01_sum = 0
+dist02_sum = 0
 for file in files:
 	if(os.path.exists(os.path.join(opt.dir1,file))):
 		# Load images
@@ -41,9 +43,12 @@ for file in files:
 
 		# Compute distance
 		dist01 = loss_fn.forward(img0,img1)
+		dist01_sum += dist01.item()
 		#map file to dcgan image distance to real
 		dist01_dict = {"dcgan " + file: dist01}
 		dist02 = loss_fn.forward(img0,img2)
+		dist02_sum += dist02.item()
+
 		#map file to ganmlp image distance to real
 		dist02_dict = {"mlpgan " + file: dist02}
 		print(dist01_dict)
@@ -53,6 +58,7 @@ for file in files:
 		#print('%s: %.3f'%(file,dist02))
 	
 		#f.writelines('%s: %.6f\n'%(file,dist01))
-
+print("DCGAN = ", dist01_sum/6000)
+print("GANMLP = ", dist02_sum/6000)
 
 f.close()
