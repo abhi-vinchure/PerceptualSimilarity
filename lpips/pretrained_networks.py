@@ -1,6 +1,7 @@
 from collections import namedtuple
 import torch
 from torchvision import models as tv
+from pretrainedmodels.models.inceptionv4 import InceptionV4, inceptionv4
 
 
 class squeezenet(torch.nn.Module):
@@ -189,7 +190,7 @@ class TransitionWithSkip(torch.nn.Module):
     def forward(self, X):
         for module in self.module:
             X = module(X)
-            if isinstance(module,torch.nn.ReLU):
+            if isinstance(module, torch.nn.ReLU):
                 skip = X
         return X, skip
 
@@ -197,13 +198,13 @@ class TransitionWithSkip(torch.nn.Module):
 class densenet(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True, num=121):
         super(densenet, self).__init__()
-        if num==121:
+        if num == 121:
             pretrained_features = tv.densenet121(pretrained=pretrained).features
-        elif num==161:
+        elif num == 161:
             pretrained_features = tv.densenet161(pretrained=pretrained).features
-        elif num==169:
+        elif num == 169:
             pretrained_features = tv.densenet169(pretrained=pretrained).features
-        elif num==201:
+        elif num == 201:
             pretrained_features = tv.densenet201(pretrained=pretrained).features
         self.N_slices = 5
 
@@ -241,20 +242,62 @@ class densenet(torch.nn.Module):
         return out
 
 
-class inception(torch.nn.Module):
+class inception(InceptionV4):
     def __init__(self, requires_grad=False, pretrained=True):
         super(inception, self).__init__()
 
+        model = inceptionv4()
+        # correct paddings
+        for m in model.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                if m.kernel_size == (3, 3):
+                    m.padding = (1, 1)
+            if isinstance(m, torch.nn.MaxPool2d):
+                m.padding = (1, 1)
+
+        # remove linear layers
+        del model.last_linear
+
+        print(model.mean)
+        self.slices = [model.features[:3],
+                       self.features[3:5],
+                       self.features[5:9],
+                       self.features[9:15],
+                       self.features[15:]]
+
     def forward(self, X):
-        return None
+        features = []
+        for i in range(len(self.slices)):
+            X = self.slices[i](X)
+            features.append(X)
+
+        outputs = namedtuple("Outputs", ['slice1', 'slice2', 'slice3', 'slice4', 'slice5'])
+        out = outputs(features[0], features[1], features[2], features[3], features[4])
+
+        return out
 
 
 class mobilenet(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(mobilenet, self).__init__()
 
+        pretrained_features = tv.mobilenet_v2(pretrained=pretrained).features
+        self.slices = [pretrained_features[:2],
+                       pretrained_features[2:4],
+                       pretrained_features[4:7],
+                       pretrained_features[7:14],
+                       pretrained_features[14:]]
+
     def forward(self, X):
-        return None
+        features = []
+        for i in range(len(self.slices)):
+            X = self.slices[i](X)
+            features.append(X)
+
+        outputs = namedtuple("Outputs", ['slice1', 'slice2', 'slice3', 'slice4', 'slice5'])
+        out = outputs(features[0], features[1], features[2], features[3], features[4])
+
+        return out
 
 
 class xception(torch.nn.Module):

@@ -88,6 +88,12 @@ class LPIPS(nn.Module):
         elif (self.pnet_type in ['densenet', 'densenet121']):
             net_type = pn.densenet
             self.chns = [64, 256, 512, 1024, 1024]
+        elif (self.pnet_type in ['inception', 'inceptionv4']):
+            net_type = pn.inception
+            self.chns = [64, 192, 384, 1024, 1536]
+        elif (self.pnet_type in ['mobilenet', 'mobilenetv2']):
+            net_type = pn.mobilenet
+            self.chns = [16, 24, 32, 96, 1280]
         self.L = len(self.chns)
 
         self.net = net_type(pretrained=not self.pnet_rand, requires_grad=self.pnet_tune)
