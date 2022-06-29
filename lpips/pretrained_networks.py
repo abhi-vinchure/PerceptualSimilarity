@@ -259,10 +259,10 @@ class inception(InceptionV4):
         del model.last_linear
 
         self.slices = [model.features[:3],
-                       self.features[3:5],
-                       self.features[5:9],
-                       self.features[9:15],
-                       self.features[15:]]
+                       model.features[3:5],
+                       model.features[5:9],
+                       model.features[9:15],
+                       model.features[15:]]
 
     def forward(self, X):
         features = []
@@ -276,7 +276,7 @@ class inception(InceptionV4):
         return out
 
 
-class mobilenet(torch.nn.Module):
+class mobilenet(tv.MobileNetV2):
     def __init__(self, requires_grad=False, pretrained=True):
         super(mobilenet, self).__init__()
 
