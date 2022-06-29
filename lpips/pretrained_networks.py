@@ -258,7 +258,6 @@ class inception(InceptionV4):
         # remove linear layers
         del model.last_linear
 
-        print(model.mean)
         self.slices = [model.features[:3],
                        self.features[3:5],
                        self.features[5:9],
