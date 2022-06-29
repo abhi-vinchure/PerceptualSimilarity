@@ -209,7 +209,7 @@ class densenet(torch.nn.Module):
 
         self.slice1 = torch.nn.Sequential(pretrained_features.conv0,
                                           pretrained_features.norm0,
-                                          TransitionWithSkip(pretrained_features.relu0)
+                                          pretrained_features.relu0
                                           )
         self.slice2 = torch.nn.Sequential(pretrained_features.pool0,
                                           pretrained_features.denseblock1,
