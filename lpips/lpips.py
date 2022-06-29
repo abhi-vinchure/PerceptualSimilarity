@@ -24,7 +24,7 @@ def upsample(in_tens, out_HW=(64, 64)):  # assumes scale factor is same for H an
 class LPIPS(nn.Module):
     def __init__(self, pretrained=True, net='alex', version='0.1', lpips=True, spatial=False,
                  pnet_rand=False, pnet_tune=False, use_dropout=True, model_path=None, eval_mode=True, verbose=True,
-                 displayParams=True):
+                 displayParams=False):
         """ Initializes a perceptual loss torch.nn.Module
 
         Parameters (default listed first)
