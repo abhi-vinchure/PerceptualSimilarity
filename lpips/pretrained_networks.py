@@ -236,7 +236,7 @@ class densenet(torch.nn.Module):
                 features.append(X)
 
         outputs = namedtuple("Outputs", ['slice1', 'slice2', 'slice3', 'slice4', 'slice5'])
-        out = outputs(features)
+        out = outputs(features[0], features[1], features[2], features[3], features[4])
 
         return out
 
