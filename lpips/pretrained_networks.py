@@ -228,7 +228,7 @@ class densenet(torch.nn.Module):
     def forward(self, X):
         features = []
         for i in range(self.N_slices):
-            X = self(X)
+            X = self.slices[i](X)
             if isinstance(X, (list, tuple)):
                 X, skip = X
                 features.append(skip)
