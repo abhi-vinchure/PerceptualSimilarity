@@ -247,17 +247,6 @@ class inception(InceptionV4):
         super(inception, self).__init__()
 
         model = inceptionv4()
-        # correct paddings
-        for m in model.modules():
-            if isinstance(m, torch.nn.Conv2d):
-                if m.kernel_size == (3, 3):
-                    m.padding = (1, 1)
-            if isinstance(m, torch.nn.MaxPool2d):
-                m.padding = (1, 1)
-
-        # remove linear layers
-        del model.last_linear
-
         self.slices = [model.features[:3],
                        model.features[3:5],
                        model.features[5:9],
@@ -276,16 +265,17 @@ class inception(InceptionV4):
         return out
 
 
-class mobilenet(tv.MobileNetV2):
+class mobilenet(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(mobilenet, self).__init__()
 
         pretrained_features = tv.mobilenet_v2(pretrained=pretrained).features
-        self.slices = [pretrained_features[:2],
-                       pretrained_features[2:4],
-                       pretrained_features[4:7],
-                       pretrained_features[7:14],
-                       pretrained_features[14:]]
+        self.slice1 = pretrained_features[:2]
+        self.slice2 = pretrained_features[2:4]
+        self.slice3 = pretrained_features[4:7]
+        self.slice4 = pretrained_features[7:14]
+        self.slice5 = pretrained_features[14:]
+        self.slices = [self.slice1, self.slice2, self.slice3, self.slice4, self.slice5]
 
     def forward(self, X):
         features = []
