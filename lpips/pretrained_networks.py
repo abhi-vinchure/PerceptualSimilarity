@@ -242,7 +242,7 @@ class densenet(torch.nn.Module):
         return out
 
 
-class inception(InceptionV4):
+class inception(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(inception, self).__init__()
 
