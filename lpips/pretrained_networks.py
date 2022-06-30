@@ -253,6 +253,15 @@ class inception(torch.nn.Module):
                        self.model.features[9:15],
                        self.model.features[15:]]
 
+        for m in self.model.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                if m.kernel_size == (3, 3):
+                    m.padding = (1, 1)
+            if isinstance(m, torch.nn.MaxPool2d):
+                m.padding = (1, 1)
+
+        del self.model.last_linear
+
     def forward(self, X):
         features = []
         for i in range(len(self.slices)):
