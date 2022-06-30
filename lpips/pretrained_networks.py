@@ -246,12 +246,12 @@ class inception(torch.nn.Module):
     def __init__(self, requires_grad=False, pretrained=True):
         super(inception, self).__init__()
 
-        model = inceptionv4()
-        self.slices = [model.features[:3],
-                       model.features[3:5],
-                       model.features[5:9],
-                       model.features[9:15],
-                       model.features[15:]]
+        self.model = inceptionv4()
+        self.slices = [self.model.features[:3],
+                       self.model.features[3:5],
+                       self.model.features[5:9],
+                       self.model.features[9:15],
+                       self.model.features[15:]]
 
     def forward(self, X):
         features = []
